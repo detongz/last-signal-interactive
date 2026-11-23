@@ -1,7 +1,7 @@
 import { scenes } from './story.js';
 import { contacts, minutesLeft } from './dispatch.js';
 
-export const initial = { id: 'tower', frequency: null, calls: [] };
+export const initial = { id: 'tower', frequency: null, calls: [], supplies: null };
 
 export function advance(state, option) {
   const scene = scenes[state.id];
@@ -15,6 +15,10 @@ export function advance(state, option) {
     if (!choice) return null;
     const [, , id, decision] = choice;
     return { ...state, id, frequency: state.id === 'desk' ? decision : state.frequency };
+  }
+  if (state.id === 'rescue' || state.id === 'warn') {
+    // Zero keeps saves from before the boat mission valid.
+    if (option >= 1 && option <= 3) return { ...state, id: 'gate', supplies: option - 1 };
   }
   if (option !== 0) return null;
   const id = scene.next ?? scene.nextBy?.[state.frequency];

@@ -1,3 +1,4 @@
+import { mountBoat } from './boat-ui.js';
 import { scenes } from './story.js';
 import { advance, initial, restore } from './engine.js';
 import { callMinutes, contacts, minutesLeft, rescueMinutes } from './dispatch.js';
@@ -63,7 +64,26 @@ function render(moveFocus = false) {
   add(story, 'p', scene.chapter, 'chapter');
   const title = add(story, 'h1', scene.title);
   title.tabIndex = -1;
+  const opening = state.id === 'tower';
+  if (opening) {
+    add(story, 'button', '接通值班室 →', 'primary opening-action')
+      .addEventListener('click', () => go(0));
+  }
+  const mission = state.id === 'rescue' || state.id === 'warn';
+  if (mission) {
+    const panel = add(story, 'section', '', 'boat-panel');
+    const board = mountBoat(panel, state.frequency, delivered => go(delivered + 1));
+    if (moveFocus) board.focus();
+  }
   const body = add(story, 'div', '', 'copy');
+  if (state.supplies !== null && (scene.dispatch || scene.end)) {
+    const report = [
+      '两处安置点都没有收到物资。洪峰过后，坡上的志愿者把仅剩的保温毯一分为二，先给浑身湿透的孩子。',
+      '只有一处安置点收到了物资。收到货的人留了一半给另一处，直到水退才沿旧路送过去。',
+      '两处安置点都收到了物资。老师用灯给后续船队指路，坡上的志愿者也能马上给伤员保暖。',
+    ];
+    add(body, 'p', '物资回执：' + report[state.supplies], 'context');
+  }
   if (scene.context) add(body, 'p', scene.context[state.frequency], 'context');
   scene.paragraphs.forEach((paragraph, index) => {
     add(body, 'p', paragraph);
@@ -101,11 +121,11 @@ function render(moveFocus = false) {
       add(button, 'span', '↗', 'arrow').setAttribute('aria-hidden', 'true');
       button.addEventListener('click', () => go(index));
     });
-  } else {
+  } else if (!mission && !opening) {
     add(actions, 'button', scene.end ? '回到广播塔 ↻' : `${scene.button ?? '继续'} →`, 'primary')
       .addEventListener('click', scene.end ? restart : () => go(0));
   }
-  if (moveFocus) {
+  if (moveFocus && !mission) {
     title.focus({ preventScroll: true });
     window.scrollTo(0, 0);
   }
