@@ -49,7 +49,32 @@ function restart() {
   render(true);
 }
 
+function renderQuickBoat() {
+  story.replaceChildren();
+  const back = add(story, 'a', '← 返回剧情', 'radio-link');
+  back.href = '#radio';
+  const panel = add(story, 'section', '', 'boat-panel');
+  return mountBoat(panel, 'school', delivered => {
+    panel.replaceChildren();
+    const title = add(panel, 'h1', `物资送达 ${delivered}/2`);
+    title.tabIndex = -1;
+    add(panel, 'button', '再开一局', 'primary').addEventListener('click', () => render(true));
+    title.focus();
+  }, '查看本局结果');
+}
+
 function render(moveFocus = false) {
+  const quick = location.hash === '#boat';
+  document.body.classList.toggle('quick-boat', quick);
+  byId('screen').hidden = quick;
+  byId('quick-entry').hidden = quick;
+  byId('reset').hidden = quick;
+  if (quick) {
+    const board = renderQuickBoat();
+    if (moveFocus) board.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+    return;
+  }
   const scene = scenes[state.id];
   byId('screen').dataset.art = scene.art;
   const delay = state.calls.length * callMinutes;
@@ -195,4 +220,5 @@ byId('sound').addEventListener('click', toggleSound);
 byId('reset').addEventListener('click', () => {
   if (scenes[state.id].end || window.confirm('从第一幕重新开始？已解锁的结局会保留。')) restart();
 });
+window.addEventListener('hashchange', () => render(true));
 render();

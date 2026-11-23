@@ -70,3 +70,9 @@ footer{display:flex;justify-content:space-between;gap:12px;margin-top:35px;paddi
 .boat-actions{margin-top:12px}
 .boat-notice{min-height:2.8em}
 .opening-action{margin-bottom:18px}
+
+.quick-entry:not([hidden]){display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;margin:14px auto 0;max-width:740px}
+.quick-entry a{display:inline-block;text-decoration:none}
+.quick-entry span{font-size:14px;color:var(--quiet)}
+.quick-boat #story{margin-top:8px}
+.radio-link{display:inline-block;margin-bottom:8px;color:var(--accent);min-height:36px;padding:5px 0}

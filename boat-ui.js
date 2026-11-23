@@ -4,7 +4,7 @@ const symbols = { '#': '▧', '.': '·', '>': '→', '<': '←', P: '港', A: 'A
 const controls = { ArrowUp: '↑', ArrowLeft: '←', ArrowDown: '↓', ArrowRight: '→' };
 const labels = { ArrowUp: '上', ArrowLeft: '左', ArrowDown: '下', ArrowRight: '右' };
 
-export function mountBoat(panel, route, finish) {
+export function mountBoat(panel, route, finish, finishLabel) {
   function element(parent, tag, text, className) {
     const node = document.createElement(tag);
     node.textContent = text;
@@ -60,7 +60,7 @@ export function mountBoat(panel, route, finish) {
     const finished = !state.fuel || state.delivered.length === 2;
     buttons.forEach(button => { button.disabled = finished; });
     done.disabled = !finished;
-    done.textContent = state.delivered.length === 2 ? '交付完成，返回电台 →' : '按当前结果返回电台 →';
+    done.textContent = finishLabel ?? (state.delivered.length === 2 ? '交付完成，返回电台 →' : '按当前结果返回电台 →');
   }
   draw();
   return board;
