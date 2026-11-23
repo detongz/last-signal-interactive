@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101719">
+  <meta name="description" content="最后一次广播。一部关于洪水、无线电和取舍的互动短片。">
+  <title>最后一次广播 | 互动短片</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="preload" href="./assets/stills.webp" as="image">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="bar">
+    <a class="brand" href="./"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span> 北岸电台</a>
+    <div class="tools"><button type="button" id="sound" aria-pressed="false">声音：关</button><button type="button" id="reset">重开</button></div>
+  </header>
+  <main>
+    <figure class="screen" id="screen" data-art="0">
+      <div id="still" class="still" aria-hidden="true"></div>
+      <div class="shade"></div>
+      <div class="screen-top"><span>北岸档案 <span class="slash">/</span> 07</span><span><i class="dot"></i> <span id="signal">信号在线</span></span></div>
+      <figcaption><span id="stamp"></span><span class="frames" aria-hidden="true">24 FPS <span class="slash">/</span> 16:9</span></figcaption>
+    </figure>
+    <div id="story"></div>
+    <noscript>请启用 JavaScript 后重试。</noscript>
+    <footer><span>北岸电台 · 原创互动短片</span><span id="progress"></span></footer>
+  </main>
+</body>
+</html>
