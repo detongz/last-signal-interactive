@@ -1,5 +1,6 @@
 import { scenes } from './story.js';
 import { advance, initial, restore } from './engine.js';
+import { callMinutes, contacts, minutesLeft, rescueMinutes } from './dispatch.js';
 
 const key = 'last-signal:v1';
 const byId = id => document.getElementById(id);
@@ -29,13 +30,15 @@ function add(parent, tag, text, className) {
 }
 
 function go(option) {
+  const previous = state;
   const next = advance(state, option);
   if (!next) return;
   history.push(option);
   state = next;
   if (scenes[state.id].end && !endings.includes(state.id)) endings.push(state.id);
   persist();
-  render(true);
+  render(previous.id !== next.id);
+  if (previous.id === next.id) byId('dispatch-summary').focus();
 }
 
 function restart() {
@@ -48,7 +51,10 @@ function restart() {
 function render(moveFocus = false) {
   const scene = scenes[state.id];
   byId('screen').dataset.art = scene.art;
-  byId('stamp').textContent = scene.stamp;
+  const delay = state.calls.length * callMinutes;
+  byId('stamp').textContent = ['gate', 'spill', 'dive'].includes(state.id)
+    ? scene.stamp.replace(/^01:(\d{2})/, (_, minute) => `01:${Number(minute) + delay}`)
+    : scene.stamp;
   byId('signal').textContent = scene.end ? '播送结束' : '信号在线';
   byId('progress').textContent = `结局记录 ${endings.length} / 4`;
   byId('reset').disabled = !history.length;
@@ -59,7 +65,15 @@ function render(moveFocus = false) {
   title.tabIndex = -1;
   const body = add(story, 'div', '', 'copy');
   if (scene.context) add(body, 'p', scene.context[state.frequency], 'context');
-  for (const paragraph of scene.paragraphs) add(body, 'p', paragraph);
+  scene.paragraphs.forEach((paragraph, index) => {
+    add(body, 'p', paragraph);
+    if (index === 0 && scene.end && state.calls.length) {
+      const net = rescueMinutes(state.calls);
+      const timing = net === 0 ? '提前调度刚好抵消了通话用掉的时间。'
+        : `算上通话，相关救援比直接去闸门${net > 0 ? '早' : '晚'}了 ${Math.abs(net)} 分钟。`;
+      add(body, 'p', timing + contacts[state.calls[0]].earlyAfter, 'context');
+    }
+  });
   if (scene.voice) {
     const quote = add(body, 'blockquote', '');
     add(quote, 'cite', scene.voice[0]);
@@ -74,6 +88,7 @@ function render(moveFocus = false) {
       add(details, 'p', entry);
     }
   }
+  if (scene.dispatch) renderDispatch(scene);
   const actions = add(story, 'div', '', 'actions');
   if (scene.choices) {
     add(actions, 'p', '决定下一步', 'chapter');
@@ -94,6 +109,30 @@ function render(moveFocus = false) {
     title.focus({ preventScroll: true });
     window.scrollTo(0, 0);
   }
+}
+
+function renderDispatch(scene) {
+  const panel = add(story, 'section', '', 'dispatch');
+  add(panel, 'h2', '开闸前联络');
+  const left = minutesLeft(state.calls);
+  const summary = add(panel, 'p', `剩余 ${left} 分钟 · 通话每次 ${callMinutes} 分钟`, 'chapter');
+  summary.id = 'dispatch-summary';
+  summary.tabIndex = -1;
+  add(panel, 'p', '第一通还能安排对方提前行动，第二通只能核实情况。也可以跳过联络，直接决定。', 'dispatch-hint');
+  for (const [order, id] of state.calls.entries()) {
+    const call = contacts[id];
+    const record = add(panel, 'div', '', 'dispatch-record');
+    add(record, 'strong', `第 ${order + 1} 通 · ${call.name}`);
+    add(record, 'p', order === 0 ? call.early : call.late);
+  }
+  const choices = add(panel, 'div', '', 'dispatch-options');
+  contacts.forEach(({ name }, id) => {
+    const called = state.calls.includes(id);
+    const button = add(choices, 'button', called ? `${name} · 已联络` : `联络${name}`);
+    button.disabled = called || left === 0;
+    button.addEventListener('click', () => go(scene.choices.length + id));
+  });
+  if (left === 0) add(panel, 'p', '01:40 · 通话窗口已关闭，请选择开闸方案。', 'dispatch-hint');
 }
 
 async function toggleSound() {

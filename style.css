@@ -45,3 +45,11 @@ details p{margin:0 0 10px}
 .choice-no,.arrow{font-family:var(--mono);color:var(--accent)}
 footer{display:flex;justify-content:space-between;gap:12px;margin-top:35px;padding:14px 0 25px;border-top:1px solid var(--line);color:var(--quiet);font:12px/1.5 var(--mono)}
 @media(max-width:600px){.bar,main{width:calc(100% - 28px)}.bar{min-height:60px}.screen{aspect-ratio:1.55;min-height:0}.screen-top,figcaption{left:10px;right:10px}.frames{display:none}#story{margin-top:25px}.brand{font-size:14px}}
+
+.dispatch{margin-top:24px;border:1px solid #71614e;border-radius:6px;padding:14px 16px;background:#192224}
+.dispatch h2{font-size:19px;margin:0 0 8px}
+.dispatch-hint,.dispatch-record p{font-size:14px;color:var(--quiet);margin:0 0 10px}
+.dispatch-record{border-top:1px solid var(--line);padding:8px 0 0}
+.dispatch-options{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.dispatch-options button{background:#253435;border:1px solid #536665;border-radius:5px;padding:6px 10px;min-height:42px}
+.dispatch-options button:hover:not(:disabled){border-color:var(--accent)}
